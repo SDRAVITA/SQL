@@ -1,0 +1,79 @@
+
+--Query1
+SELECT movie_year 
+FROM Movie
+WHERE movie_title='American Beauty';
+
+--Query 2
+SELECT A.*
+FROM reviewer A INNER JOIN rating B
+ON A.reviewer_id = B.reviewer_id
+WHERE B.rev_stars>=7;
+
+--Query 3
+SELECT *
+FROM Movie
+WHERE movie_title LIKE '%Boogie%Nights%'
+ORDER BY movie_year ASC;
+
+--Query 4
+SELECT DISTINCT * 
+FROM movie 
+WHERE movie_id IN (
+SELECT movie_id 
+FROM rating 
+WHERE rev_stars<7) 
+ORDER BY movie_year desc;
+
+--Query 5
+SELECT reviewer_name, movie_title 
+FROM reviewer, movie, rating, rating r2
+WHERE rating.movie_id=movie.movie_id 
+  AND reviewer.reviewer_id=rating.reviewer_ID 
+    AND rating.reviewer_id = r2.reviewer_id 
+GROUP BY reviewer_name, movie_title HAVING count(*) > 2;
+
+--Query 6
+SELECT genre_title, AVG(movie_time), COUNT(genre_title) 
+FROM movie M
+INNER JOIN  genre G ON M.genre_id=G.genre_id
+GROUP BY genre_title;
+	
+--Query 7
+SELECT movie_title, movie_year, release_date,dir_first_name, dir_last_name 
+FROM movie M
+INNER JOIN  director D
+   ON M.director_id=D.director_id
+WHERE release_date <'01/01/1989'
+ORDER BY release_date desc;
+	
+--Query 8 
+SELECT movie_title, MAX(rev_stars)
+FROM movie, rating 
+WHERE movie.movie_id=rating.movie_id 
+AND movie_title LIKE ('%Am%')
+GROUP BY  movie_title
+ORDER BY movie_title;
+	
+--Query 9
+CREATE view movie_budget AS(
+	SELECT movie_title,M.actor_id ,actor_first_name, actor_last_name, budget
+	FROM movie M
+	INNER JOIN actor A
+	ON M.actor_id=A.actor_id
+	WHERE budget<600000
+)
+SELECT * from movie_budget
+
+--Query 10
+WITH reviewer_details AS(
+SELECT  movie_title,reviewer_id,rev_stars
+FROM movie
+INNER JOIN rating ON movie.movie_id = rating.movie_id
+WHERE rev_stars BETWEEN 6 AND 7
+ORDER BY  movie_title,rev_stars
+)
+SELECT reviewer_details.*,reviewer_name
+FROM reviewer_details
+INNER JOIN reviewer ON reviewer.reviewer_id = reviewer_details.reviewer_id
+ORDER By reviewer_name
